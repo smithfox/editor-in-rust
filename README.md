@@ -14,11 +14,13 @@ $cd /e/git/editor-in-rust
 $cargo new project --bin
 ```
 
+## Console 版本 Hello World
 直接运行就可以显示: Hello, World!
 ```
 $cargo run
 ```
 
+## Dialog 版本 Hello World
 编辑 /e/git/editor-in-rust/project/src/main.rs 为一个 GUI 版本的 Hello World!
 
 需要添加 [winapi](https://crates.io/crates/winapi), [user32](https://crates.io/crates/user32-sys) 外部库
@@ -28,3 +30,5 @@ $cargo run
 winapi = "0.2.8"
 user32-sys = "0.2.0"
 ```
+
+## 窗体版本 Hello World
