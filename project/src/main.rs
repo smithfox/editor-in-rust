@@ -34,7 +34,7 @@ fn main(){
 unsafe extern "system" fn windowproc(handle: HWND, msg: UINT, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
     match msg{
         WM_CREATE => {
-            CreateAppMenu(handle);
+            //CreateTextView(handle);
         }
         WM_COMMAND => {
             let idm = wparam as UINT;
@@ -86,8 +86,8 @@ fn win_main() -> i32 {
             wc.lpszClassName, 
             szTitle.as_ptr(),
             WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-            100, //CW_USEDEFAULT
-            100, //CW_USEDEFAULT
+            CW_USEDEFAULT,
+            CW_USEDEFAULT,
             350, 
             250, 
             0 as HWND,
@@ -95,6 +95,9 @@ fn win_main() -> i32 {
             hInst, 
             ptr::null_mut()  //0 as LPVOID
         );
+
+        CreateAppMenu(hwnd);
+        
         ShowWindow(hwnd, SW_RESTORE);
         UpdateWindow(hwnd);
         let mut msg: MSG = mem::zeroed();
@@ -128,7 +131,8 @@ pub const MIIM_FTYPE:UINT = 0x00000100;
 
 pub const MFT_SEPARATOR:UINT = 0x00000800;
 
-pub unsafe fn CreateAppMenu(hwnd : HWND) {
+pub unsafe fn CreateAppMenu(hwnd : HWND) -> HMENU {
+    let no_menu:HMENU = 0 as HMENU;
     let mut main_menu:HMENU = GetMenu(hwnd);
     if main_menu == ptr::null_mut() {
         main_menu = CreateMenu();
@@ -139,42 +143,42 @@ pub unsafe fn CreateAppMenu(hwnd : HWND) {
     let menu_file_text:Vec<u16> = "&File".to_wide_null();
     let menu_file:HMENU = CreateMenu();
     if !InsertTextMenu(main_menu,0,IDM_FILE,menu_file_text, menu_file) {
-        return;
+        return no_menu;
     }
 
     let menu_filenew_text:Vec<u16> = "&New".to_wide_null();
     if !InsertTextMenu(menu_file,0,IDM_FILE_NEW,menu_filenew_text, 0 as HMENU) {
-        return;
+        return no_menu;
     }
 
     let menu_fileopen_text:Vec<u16> = "&Open...".to_wide_null();
     if !InsertTextMenu(menu_file,1,IDM_FILE_OPEN,menu_fileopen_text, 0 as HMENU) {
-        return;
+        return no_menu;
     }
 
     if !InsertSeperatorMenu(menu_file,2) {
-        return;
+        return no_menu;
     }
 
     let menu_fileexit_text:Vec<u16> = "&Exit".to_wide_null();
     if !InsertTextMenu(menu_file,3,IDM_FILE_EXIT,menu_fileexit_text, 0 as HMENU) {
-        return;
+        return no_menu;
     }
 
     let menu_help_text:Vec<u16> = "&Help".to_wide_null();
     let menu_help:HMENU = CreateMenu();
     if !InsertTextMenu(main_menu,1,IDM_HELP,menu_help_text, menu_help) {
-        return;
+        return no_menu;
     }
 
     let menu_helpabout_text:Vec<u16> = "&About".to_wide_null();
     if !InsertTextMenu(menu_help,1,IDM_HELP_ABOUT,menu_helpabout_text, 0 as HMENU) {
-        return;
+        return no_menu;
     }
 
     DrawMenuBar(hwnd);
     
-    return
+    main_menu
 }
 
 fn InsertTextMenu(parent:HMENU, pos:UINT, id:UINT, mut text:Vec<u16>, menu_handle:HMENU) -> bool {
