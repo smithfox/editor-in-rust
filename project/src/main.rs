@@ -40,7 +40,7 @@ unsafe extern "system" fn windowproc(handle: HWND, msg: UINT, wparam: WPARAM, lp
             let idm = wparam as UINT;
             match idm {
                 IDM_HELP_ABOUT => {
-                    let about_message: Vec<u16> = OsStr::new("You click about menu").encode_wide().chain(Some(0)).collect();
+                    let about_message = "You click about menu".to_wide_null();
                     MessageBoxW(ptr::null_mut(), about_message.as_ptr(), about_message.as_ptr(), MB_OK);
                 }
                 _ => {}
@@ -136,18 +136,18 @@ pub unsafe fn CreateAppMenu(hwnd : HWND) {
         //TODO: adjust_window_size_for_menu);
     }
 
-    let menu_file_text:Vec<u16> = OsStr::new("&File").encode_wide().chain(Some(0)).collect();
+    let menu_file_text:Vec<u16> = "&File".to_wide_null();
     let menu_file:HMENU = CreateMenu();
     if !InsertTextMenu(main_menu,0,IDM_FILE,menu_file_text, menu_file) {
         return;
     }
 
-    let menu_filenew_text:Vec<u16> = OsStr::new("&New").encode_wide().chain(Some(0)).collect();
+    let menu_filenew_text:Vec<u16> = "&New".to_wide_null();
     if !InsertTextMenu(menu_file,0,IDM_FILE_NEW,menu_filenew_text, 0 as HMENU) {
         return;
     }
 
-    let menu_fileopen_text:Vec<u16> = OsStr::new("&Open...").encode_wide().chain(Some(0)).collect();
+    let menu_fileopen_text:Vec<u16> = "&Open...".to_wide_null();
     if !InsertTextMenu(menu_file,1,IDM_FILE_OPEN,menu_fileopen_text, 0 as HMENU) {
         return;
     }
@@ -156,18 +156,18 @@ pub unsafe fn CreateAppMenu(hwnd : HWND) {
         return;
     }
 
-    let menu_fileexit_text:Vec<u16> = OsStr::new("&Exit").encode_wide().chain(Some(0)).collect();
+    let menu_fileexit_text:Vec<u16> = "&Exit".to_wide_null();
     if !InsertTextMenu(menu_file,3,IDM_FILE_EXIT,menu_fileexit_text, 0 as HMENU) {
         return;
     }
 
-    let menu_help_text:Vec<u16> = OsStr::new("&Help").encode_wide().chain(Some(0)).collect();
+    let menu_help_text:Vec<u16> = "&Help".to_wide_null();
     let menu_help:HMENU = CreateMenu();
     if !InsertTextMenu(main_menu,1,IDM_HELP,menu_help_text, menu_help) {
         return;
     }
 
-    let menu_helpabout_text:Vec<u16> = OsStr::new("&About").encode_wide().chain(Some(0)).collect();
+    let menu_helpabout_text:Vec<u16> = "&About".to_wide_null();
     if !InsertTextMenu(menu_help,1,IDM_HELP_ABOUT,menu_helpabout_text, 0 as HMENU) {
         return;
     }
