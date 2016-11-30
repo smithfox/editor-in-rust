@@ -6,14 +6,16 @@ extern crate user32;
 
 mod widestr;
 mod menu;
+mod win;
 
 use std::ptr;
 use std::mem;
 use winapi::*;
-use kernel32::*;
 use user32::*;
 
 use widestr::ToWide;
+use win::instance::Application;
+use win::form::Form;
 
 fn main(){
     let exit_code = win_main();
@@ -44,14 +46,8 @@ unsafe extern "system" fn windowproc(handle: HWND, msg: UINT, wparam: WPARAM, lp
 }
 
 fn win_main() -> i32 {
-    let hInst:HINSTANCE = unsafe{
-        let hmodule: HINSTANCE = GetModuleHandleW(0 as LPCWSTR);
-        hmodule
-    };
-
-    //We use this later as a pointer, so make sure it doesn't get thrown away
-    let szAppName = "Example".to_wide_null();
-    let szTitle = "Example Title".to_wide_null();
+    let app:Application = Application::new();
+    let mut form = Form{Name:win::to_wchar("Example"),Title:win::to_wchar("Example Title")};
 
     let wc=WNDCLASSEXW{
         cbSize: mem::size_of::<WNDCLASSEXW>() as UINT,
@@ -59,13 +55,13 @@ fn win_main() -> i32 {
         lpfnWndProc: Some(windowproc),
         cbClsExtra: 0,
         cbWndExtra: 0,
-        hInstance: hInst,
+        hInstance: app.instance,
         hIcon: unsafe{LoadIconW(ptr::null_mut(), IDI_APPLICATION)}, //0 as HICON
         hIconSm: unsafe{LoadIconW(ptr::null_mut(), IDI_APPLICATION)}, //0 as HICON
         hCursor: unsafe{LoadCursorW(ptr::null_mut(), IDC_ARROW)},//0 as HCURSOR
         hbrBackground: unsafe{GetSysColorBrush(COLOR_3DFACE)}, //(COLOR_WINDOWFRAME) as HBRUSH,
         lpszMenuName: ptr::null_mut(),//0 as LPCWSTR,
-        lpszClassName: szAppName.as_ptr()
+        lpszClassName: form.Name.as_ptr()
     };
 
     return unsafe{
@@ -73,7 +69,7 @@ fn win_main() -> i32 {
         let hwnd = user32::CreateWindowExW(
             0, 
             wc.lpszClassName, 
-            szTitle.as_ptr(),
+            form.Title.as_ptr(),
             WS_OVERLAPPEDWINDOW | WS_VISIBLE,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
@@ -81,7 +77,7 @@ fn win_main() -> i32 {
             250, 
             0 as HWND,
             0 as HMENU,
-            hInst, 
+            app.instance, 
             ptr::null_mut()  //0 as LPVOID
         );
 
@@ -89,12 +85,10 @@ fn win_main() -> i32 {
 
         ShowWindow(hwnd, SW_RESTORE);
         UpdateWindow(hwnd);
-        let mut msg: MSG = mem::zeroed();
-        while GetMessageW(&mut msg, 0 as HWND, 0, 0) != 0 {
-            TranslateMessage(&msg);
-            DispatchMessageW(&msg);
-        }
+        
+        
+        app.run(&mut form);
 
-        msg.wParam as i32
+        0
     };
 }

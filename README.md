@@ -32,3 +32,8 @@ user32-sys = "0.2.0"
 ```
 
 ## 窗体版本 Hello World
+期间遇到的问题: https://github.com/retep998/winapi-rs/issues/345
+
+## 将main.rs分隔为多个文件
+lib.rs mod use self
+
